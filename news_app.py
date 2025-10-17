@@ -46,15 +46,16 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# 📌 Fetch only once and store in session state
+if "articles" not in st.session_state:
+    with st.spinner("Fetching latest news..."):
+        st.session_state.articles = fetch_news()
+
 # Slider for number of articles
 num_articles = st.slider("Select number of news articles:", min_value=5, max_value=15, value=10)
 
-# Fetch all articles
-with st.spinner("Fetching latest news..."):
-    all_articles = fetch_news()
-
-# Limit results based on slider
-articles = all_articles[:num_articles]
+# Use the already stored articles to maintain order
+articles = st.session_state.articles[:num_articles]
 
 if not articles:
     st.error("No news articles found.")
@@ -67,7 +68,6 @@ else:
 
     full_text = ""
     for i, article in enumerate(articles):
-        # Colored article title
         st.markdown(
             f"<h3 style='color: #d35400;'>{i+1}. {article['title']}</h3>",
             unsafe_allow_html=True
